@@ -1,3 +1,10 @@
+dados importantes para conexão ao banco de dados:
+senha do banco: senhaTopBD157A$
+banco: u794777727_BlackBrotherBD
+usuário: u794777727_BlackBrothers1
+host: srv1526.hstgr.io
+
+
 Primeiros passos para utilizar a API: 
 
 Faça a instalação das seguintes bibliotecas:
