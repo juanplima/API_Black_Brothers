@@ -49,6 +49,29 @@ def generic_crud(model):
         return '', 204
     delete.__name__ = f"delete_{model_name}"
 
+@routes.route("/Usuario/login", methods=["POST"])
+def login_usuario():
+    print(">>> ENTROU NA ROTA DE LOGIN <<<")  # <-- log
+    
+    data = request.json
+    login = data.get("login")
+    senha = data.get("senha")
+
+    print(f"Login recebido: {login}, Senha recebida: {senha}")
+
+    if not login or not senha:
+        return jsonify({"error": "Campos 'login' e 'senha' são obrigatórios"}), 400
+
+    usuario = Usuario.query.filter_by(Login=login, Senha=senha).first()
+
+    if usuario:
+        print(">>> USUÁRIO ENCONTRADO <<<")
+        return jsonify(usuario.to_dict())
+    else:
+        print(">>> USUÁRIO NÃO ENCONTRADO <<<")
+        return jsonify({"error": "Usuário não encontrado"}), 404
+
+
 # Registra todas as rotas CRUD para os modelos
 models_list = [
     Estado, Cidade, Bairro, CEP, Tipo_Endereco, Endereco, Academia,
