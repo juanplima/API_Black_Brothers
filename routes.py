@@ -12,7 +12,20 @@ def generic_crud(model):
 
     @routes.route(f"/{model_name}", methods=["GET"])
     def get_all(model=model):
-        records = model.query.all()
+        query = model.query
+
+        #Aplica filtros com base nos parâmetros de consulta, se nao tiver nenhum parâmetro, retorna todos os registros.
+        for key, value in request.args.items():
+            #hasattr verifica se o modelo tem o atributo e getattr retorna o objeto em si.
+            if hasattr(model, key):
+                attr = getattr(model, key)
+                try:
+                    value = int(value)
+                except ValueError:
+                    pass
+                query = query.filter(attr == value)
+
+        records = query.all()
         return jsonify([r.to_dict() for r in records])
     get_all.__name__ = f"get_all_{model_name}"
 
