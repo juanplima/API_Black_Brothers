@@ -125,12 +125,15 @@ class Plano(BaseModel):
     __tablename__ = 'Plano'
     ID_Planos = db.Column(db.Integer, primary_key=True, autoincrement=True)
     FK_TipoPlano_ID = db.Column(db.Integer, db.ForeignKey('Tipo_Plano.ID_TipoPlanos'), nullable=False)
+    FK_Usuario_ID = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
 
 class Aluno(BaseModel):
     __tablename__ = 'Aluno'
     Matricula = db.Column(db.Integer, primary_key=True, autoincrement=True)
     FK_Usuario_ID = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
     FK_Planos_ID = db.Column(db.Integer, db.ForeignKey('Plano.ID_Planos'), nullable=False)
+    altura = db.Column(db.Numeric(4, 2), nullable=True)
+    peso = db.Column(db.Numeric(5, 2), nullable=True)
 
 class Menu_Principal(BaseModel):
     __tablename__ = 'Menu_Principal'
