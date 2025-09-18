@@ -13,10 +13,7 @@ def generic_crud(model):
     @routes.route(f"/{model_name}", methods=["GET"])
     def get_all(model=model):
         query = model.query
-
-        #Aplica filtros com base nos parâmetros de consulta, se nao tiver nenhum parâmetro, retorna todos os registros.
         for key, value in request.args.items():
-            #hasattr verifica se o modelo tem o atributo e getattr retorna o objeto em si.
             if hasattr(model, key):
                 attr = getattr(model, key)
                 try:
@@ -24,11 +21,11 @@ def generic_crud(model):
                 except ValueError:
                     pass
                 query = query.filter(attr == value)
-
         records = query.all()
         return jsonify([r.to_dict() for r in records])
     get_all.__name__ = f"get_all_{model_name}"
 
+    # ... (as outras funções do generic_crud: get_one, create, update, delete continuam iguais) ...
     @routes.route(f"/{model_name}/<int:id>", methods=["GET"])
     def get_one(id, model=model):
         record = model.query.get_or_404(id)
@@ -64,32 +61,77 @@ def generic_crud(model):
 
 @routes.route("/Usuario/login", methods=["POST"])
 def login_usuario():
-    print(">>> ENTROU NA ROTA DE LOGIN <<<")  # <-- log
-    
     data = request.json
     login = data.get("login")
     senha = data.get("senha")
-
-    print(f"Login recebido: {login}, Senha recebida: {senha}")
-
     if not login or not senha:
         return jsonify({"error": "Campos 'login' e 'senha' são obrigatórios"}), 400
-
     usuario = Usuario.query.filter_by(Login=login, Senha=senha).first()
-
     if usuario:
-        print(">>> USUÁRIO ENCONTRADO <<<")
         return jsonify(usuario.to_dict())
     else:
-        print(">>> USUÁRIO NÃO ENCONTRADO <<<")
         return jsonify({"error": "Usuário não encontrado"}), 404
 
 
-# Registra todas as rotas CRUD para os modelos
+# ROTA ALUNOS
+@routes.route("/Aluno", methods=["GET"])
+def get_alunos_com_nomes():
+    resultados = db.session.query(
+        Aluno, Pessoa, Tipo_Plano
+    ).join(
+        Usuario, Aluno.FK_Usuario_ID == Usuario.ID_Usuario
+    ).join(
+        Pessoa, Usuario.FK_Pessoa_ID == Pessoa.CPF
+    ).join(
+        Plano, Aluno.FK_Planos_ID == Plano.ID_Planos
+    ).join(
+        Tipo_Plano, Plano.FK_TipoPlano_ID == Tipo_Plano.ID_TipoPlanos
+    ).all()
+    lista_de_alunos = []
+    for aluno, pessoa, tipo_plano in resultados:
+        aluno_data = aluno.to_dict()
+        aluno_data['Nome'] = pessoa.Nome 
+        aluno_data['Email'] = pessoa.Email
+        aluno_data['CPF'] = pessoa.CPF
+        aluno_data['Nome_Plano'] = tipo_plano.Nome
+        aluno_data['Preco_Plano'] = float(tipo_plano.Preco)
+        lista_de_alunos.append(aluno_data)
+    return jsonify(lista_de_alunos)
+
+
+# ROTA PLANOS
+@routes.route("/Tipo_Plano", methods=["GET"])
+def get_planos_com_detalhes():
+    planos_detalhados = Tipo_Plano.query.all()
+    return jsonify([plano.to_dict() for plano in planos_detalhados])
+
+
+# <<< AJUSTE AQUI: ADICIONAMOS A NOVA ROTA PARA USUaRIOS >>>
+@routes.route("/Usuario", methods=["GET"])
+def get_usuarios_com_detalhes():
+    resultados = db.session.query(
+        Usuario, 
+        Pessoa
+    ).join(
+        Pessoa, Usuario.FK_Pessoa_ID == Pessoa.CPF
+    ).all()
+
+    lista_de_usuarios = []
+    for usuario, pessoa in resultados:
+        usuario_data = usuario.to_dict()
+        usuario_data['Nome'] = pessoa.Nome
+        usuario_data['Email'] = pessoa.Email
+        usuario_data['CPF'] = pessoa.CPF
+        lista_de_usuarios.append(usuario_data)
+        
+    return jsonify(lista_de_usuarios)
+
+
+# Registra todas as rotas CRUD para os modelos genéricos
 models_list = [
     Estado, Cidade, Bairro, CEP, Tipo_Endereco, Endereco, Academia,
-    Tipo_Telefone, Pessoa, Telefone, Usuario, Cargo, Empregado, Dieta,
-    Treino, Tipo_Pagamento, Plano, Tipo_Plano, Aluno, Menu_Principal,
+    Tipo_Telefone, Pessoa, Telefone, Cargo, Empregado, Dieta, # <<< AJUSTE AQUI: 'Usuario' FOI REMOVIDO >>>
+    Treino, Tipo_Pagamento, Menu_Principal,
     Comunidade, Feedbacks, Tipo_Feedbacks
 ]
 
