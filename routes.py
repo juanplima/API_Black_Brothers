@@ -74,8 +74,6 @@ def login_usuario():
     else:
         return jsonify({"error": "Usuário não encontrado"}), 404
 
-
-# <<< ROTA ESPECIALIZADA E RENOMEADA PARA ALUNOS >>>
 @routes.route("/alunos/detalhes", methods=["GET"])
 def get_alunos_com_detalhes():
     resultados = db.session.query(
@@ -100,15 +98,6 @@ def get_alunos_com_detalhes():
         lista_de_alunos.append(aluno_data)
     return jsonify(lista_de_alunos)
 
-
-# ROTA PARA OS PLANOS (não precisa renomear, pois não conflita)
-@routes.route("/Tipo_Plano", methods=["GET"])
-def get_planos_com_detalhes():
-    planos_detalhados = Tipo_Plano.query.all()
-    return jsonify([plano.to_dict() for plano in planos_detalhados])
-
-
-# <<< ROTA ESPECIALIZADA E RENOMEADA PARA USUÁRIOS >>>
 @routes.route("/usuarios/detalhes", methods=["GET"])
 def get_usuarios_com_detalhes():
     resultados = db.session.query(
@@ -128,8 +117,6 @@ def get_usuarios_com_detalhes():
     return jsonify(lista_de_usuarios)
 
 
-# Registra todas as rotas CRUD para os modelos genéricos
-# <<< MUDANÇA FINAL: TODOS OS MODELOS ESTÃO NA LISTA NOVAMENTE >>>
 models_list = [
     Estado, Cidade, Bairro, CEP, Tipo_Endereco, Endereco, Academia,
     Tipo_Telefone, Pessoa, Telefone, Usuario, Cargo, Empregado, Dieta,
