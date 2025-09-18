@@ -1,3 +1,5 @@
+# routes.py (versão final com rotas compatíveis para web e mobile)
+
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models import *
@@ -7,6 +9,7 @@ routes = Blueprint('routes', __name__)
 def register_routes(app, db):
     app.register_blueprint(routes)
 
+# A função genérica continua a mesma, criando rotas para todos os modelos
 def generic_crud(model):
     model_name = model.__tablename__
 
@@ -25,7 +28,6 @@ def generic_crud(model):
         return jsonify([r.to_dict() for r in records])
     get_all.__name__ = f"get_all_{model_name}"
 
-    # ... (as outras funções do generic_crud: get_one, create, update, delete continuam iguais) ...
     @routes.route(f"/{model_name}/<int:id>", methods=["GET"])
     def get_one(id, model=model):
         record = model.query.get_or_404(id)
@@ -62,7 +64,7 @@ def generic_crud(model):
 @routes.route("/Usuario/login", methods=["POST"])
 def login_usuario():
     data = request.json
-    login = data.get("login") 
+    login = data.get("login")
     senha = data.get("senha")
     if not login or not senha:
         return jsonify({"error": "Campos 'login' e 'senha' são obrigatórios"}), 400
@@ -73,9 +75,9 @@ def login_usuario():
         return jsonify({"error": "Usuário não encontrado"}), 404
 
 
-# ROTA ALUNOS
-@routes.route("/Aluno", methods=["GET"])
-def get_alunos_com_nomes():
+# <<< ROTA ESPECIALIZADA E RENOMEADA PARA ALUNOS >>>
+@routes.route("/alunos/detalhes", methods=["GET"])
+def get_alunos_com_detalhes():
     resultados = db.session.query(
         Aluno, Pessoa, Tipo_Plano
     ).join(
@@ -99,15 +101,15 @@ def get_alunos_com_nomes():
     return jsonify(lista_de_alunos)
 
 
-# ROTA PLANOS
+# ROTA PARA OS PLANOS (não precisa renomear, pois não conflita)
 @routes.route("/Tipo_Plano", methods=["GET"])
 def get_planos_com_detalhes():
     planos_detalhados = Tipo_Plano.query.all()
     return jsonify([plano.to_dict() for plano in planos_detalhados])
 
 
-# <<< AJUSTE AQUI: ADICIONAMOS A NOVA ROTA PARA USUaRIOS >>>
-@routes.route("/Usuario", methods=["GET"])
+# <<< ROTA ESPECIALIZADA E RENOMEADA PARA USUÁRIOS >>>
+@routes.route("/usuarios/detalhes", methods=["GET"])
 def get_usuarios_com_detalhes():
     resultados = db.session.query(
         Usuario, 
@@ -123,15 +125,15 @@ def get_usuarios_com_detalhes():
         usuario_data['Email'] = pessoa.Email
         usuario_data['CPF'] = pessoa.CPF
         lista_de_usuarios.append(usuario_data)
-        
     return jsonify(lista_de_usuarios)
 
 
 # Registra todas as rotas CRUD para os modelos genéricos
+# <<< MUDANÇA FINAL: TODOS OS MODELOS ESTÃO NA LISTA NOVAMENTE >>>
 models_list = [
     Estado, Cidade, Bairro, CEP, Tipo_Endereco, Endereco, Academia,
-    Tipo_Telefone, Pessoa, Telefone, Cargo, Empregado, Dieta, # <<< AJUSTE AQUI: 'Usuario' FOI REMOVIDO >>>
-    Treino, Tipo_Pagamento, Menu_Principal,
+    Tipo_Telefone, Pessoa, Telefone, Usuario, Cargo, Empregado, Dieta,
+    Treino, Tipo_Pagamento, Plano, Tipo_Plano, Aluno, Menu_Principal,
     Comunidade, Feedbacks, Tipo_Feedbacks
 ]
 
