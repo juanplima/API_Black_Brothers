@@ -62,7 +62,7 @@ def generic_crud(model):
 @routes.route("/Usuario/login", methods=["POST"])
 def login_usuario():
     data = request.json
-    login = data.get("login")
+    login = data.get("login") 
     senha = data.get("senha")
     if not login or not senha:
         return jsonify({"error": "Campos 'login' e 'senha' são obrigatórios"}), 400
