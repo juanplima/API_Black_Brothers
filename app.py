@@ -4,7 +4,10 @@ from extensions import db
 from routes import register_routes
 
 app = Flask(__name__)
-CORS(app)
+
+# <<< CORREÇÃO APLICADA AQUI >>>
+# Trocamos a inicialização simples pela versão completa e robusta
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Configurações do seu banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://u794777727_BlackBrothers1:senhanovaBD157@193.203.175.99/u794777727_BlackBrotherBD'
@@ -25,4 +28,3 @@ with app.app_context():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-

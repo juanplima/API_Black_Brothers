@@ -101,13 +101,14 @@ class Dieta(BaseModel):
     Descricao_Refeicao = db.Column(db.Text, nullable=False)
     FK_Empregado_ID = db.Column(db.Integer, db.ForeignKey('Empregado.ID_Empregado'), nullable=False)
 
+# Em models.py
 class Treino(BaseModel):
     __tablename__ = 'Treino'
     ID_Treino = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Nome = db.Column(db.String(1000), nullable=False)
-    Exercicio_Concluido = db.Column(db.Text, nullable=False)
-    Video = db.Column(db.String(2400))
-    FK_Empregado_ID = db.Column(db.Integer, db.ForeignKey('Empregado.ID_Empregado'), nullable=False)
+    # Exercicio_Concluido = db.Column(db.Text, nullable=False)  comentado pq nao existe no banco
+    # Video = db.Column(db.String(2400)) comentado pq nao existe no banco
+    FK_Empregado_ID = db.Column(db.Integer, db.ForeignKey('Empregado.ID_Empregado'), nullable=True)
 
 class Tipo_Pagamento(BaseModel):
     __tablename__ = 'Tipo_Pagamento'
